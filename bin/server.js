@@ -1,8 +1,9 @@
-'use strict'
+'use strict';
 
 const app = require('../src/app');
 const http = require('http');
 const debug = require('debug')('balta:server');
+
 
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
@@ -13,7 +14,8 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-console.log(`OK PORT ${port} `);
+console.log(`RUN PORT ${port} `);
+console.log('-------------------------');
 
 function normalizePort(val){
     const port = parseInt(val,10);
