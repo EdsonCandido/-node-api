@@ -1,6 +1,7 @@
 'use strict';
 const mongoose = require('mongoose');
 const Product = require('../models/Product');
+const validationContract = require('../validation/validation');
 
 exports.get = (req, res, next) => {
     Product.find({}).then(data => {
@@ -33,8 +34,18 @@ exports.getByTag = (req, res, next) => {
         res.status(400).send({error: '[ERRO] Falha ao Listar o Produto', data: e});
     });
 };
-
 exports.post = (req, res, next) => {
+
+    let contract = new validationContract();
+    contract.hasMinLen(req.body.title, 3, 'O Título deve Conter pelo Menos Três Caracteres ');
+    contract.hasMinLen(req.body.slug, 3, 'O Slug deve Conter pelo Menos Três Caracteres ');
+    contract.hasMinLen(req.body.description, 3, 'A descrição deve Conter pelo Menos Três Caracteres ');
+
+    if(!contract.isValid()){
+        res.status(400).send(contract.errors()).end();
+        return;
+    }
+
     let product = new Product(req.body);
     product.save().then(x => {
         res.status(201).send({mensage : 'Produto Cadastrado com Sucesso' });
@@ -42,7 +53,6 @@ exports.post = (req, res, next) => {
         res.status(400).send({error: '[ERRO] Falha no cadastro do Produto', data: e});
     });
 };
-
 exports.put = (req, res, next) => {
     Product.findByIdAndUpdate(req.param('id'), {
         $set: {
@@ -57,7 +67,6 @@ exports.put = (req, res, next) => {
         res.status(400).send({message :  'Error ao atualizar', data: err});
     });
 };
-
 exports.del = (req, res, next) =>{
    Product.findOneAndRemove(req.param('id')).then(x => {
         res.status(200).send({mensage : 'Produto Removido com Sucesso!'});
